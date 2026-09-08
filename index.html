@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kumil Canvas Editor & Stamp App</title>
+    <!-- Tailwind CSS untuk Layout -->
+    <script src="http://cdn.tailwindcss.com"></script>
+    <!-- Fabric.js Library -->
+    <script src="js/fabric.min.js"></script>
+    <script src="js/objects.js"></script>
+  </head>
+  <body class="bg-slate-100 h-screen flex flex-col">
+    <!-- Header Toolbar -->
+    <header
+      class="bg-white border-b px-6 py-3 flex justify-between items-center shadow-sm"
+    >
+      <h1 class="text-lg font-bold text-slate-800">Canvas Stamp Editor</h1>
+      <div class="flex items-center gap-4">
+        <!-- Tambahkan di Header Toolbar (di dalam div flex items-center gap-3) -->
+        <div
+          class="flex items-center gap-2 border-l border-r px-3 py-1 border-slate-200"
+        >
+          <label class="text-xs font-semibold text-slate-500">Teks:</label>
+
+          <!-- Dropdown Font Family -->
+          <select
+            id="fontFamily"
+            class="text-xs border rounded px-2 py-1.5 bg-white text-slate-700 focus:outline-none focus:border-blue-500"
+          >
+            <option value="sans-serif">Sans-Serif</option>
+            <option value="Arial">Arial</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Impact">Impact</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+
+          <!-- Input Font Size -->
+          <input
+            type="number"
+            id="fontSize"
+            value="24"
+            min="8"
+            max="120"
+            class="w-16 text-xs border rounded px-2 py-1.5 text-center text-slate-700 focus:outline-none focus:border-blue-500"
+            title="Ukuran Font (px)"
+          />
+          <!-- Tambahan tombol Bold, Italic, Underline di Toolbar Teks -->
+          <div class="flex items-center gap-1 border-r pr-3 border-slate-200">
+            <button
+              id="btnBold"
+              title="Bold (Tebal)"
+              class="w-8 h-8 font-bold border rounded hover:bg-slate-100 text-slate-700 transition flex items-center justify-center"
+            >
+              B
+            </button>
+            <button
+              id="btnItalic"
+              title="Italic (Miring)"
+              class="w-8 h-8 italic font-serif border rounded hover:bg-slate-100 text-slate-700 transition flex items-center justify-center"
+            >
+              I
+            </button>
+            <button
+              id="btnUnderline"
+              title="Underline (Garis Bawah)"
+              class="w-8 h-8 underline border rounded hover:bg-slate-100 text-slate-700 transition flex items-center justify-center"
+            >
+              U
+            </button>
+          </div>
+
+          <!-- Tambahan Tombol Alignment Teks -->
+          <div class="flex items-center gap-1 border-r pr-3 border-slate-200">
+            <button
+              id="btnAlignLeft"
+              title="Rata Kiri"
+              class="w-8 h-8 border rounded hover:bg-slate-100 text-slate-700 transition flex items-center justify-center"
+            >
+              <!-- Icon Align Left -->
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h10M4 18h14"
+                />
+              </svg>
+            </button>
+            <button
+              id="btnAlignCenter"
+              title="Rata Tengah"
+              class="w-8 h-8 border rounded hover:bg-slate-100 text-slate-700 transition flex items-center justify-center"
+            >
+              <!-- Icon Align Center -->
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M7 12h10M5 18h14"
+                />
+              </svg>
+            </button>
+            <button
+              id="btnAlignRight"
+              title="Rata Kanan"
+              class="w-8 h-8 border rounded hover:bg-slate-100 text-slate-700 transition flex items-center justify-center"
+            >
+              <!-- Icon Align Right -->
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M10 12h10M6 18h14"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <span class="text-xs font-semibold text-slate-500 mr-1">Layer:</span>
+        <button
+          id="btnBringToFront"
+          title="Paling Depan"
+          class="p-1.5 hover:bg-slate-100 rounded text-slate-700 transition border"
+          border
+        >
+          🔝 Front
+        </button>
+        <button
+          id="btnBringForward"
+          title="Maju Satu Step"
+          class="p-1.5 hover:bg-slate-100 rounded text-slate-700 transition border"
+        >
+          ⬆️ Forward
+        </button>
+        <button
+          id="btnSendBackward"
+          title="Mundur Satu Step"
+          class="p-1.5 hover:bg-slate-100 rounded text-slate-700 transition border"
+        >
+          ⬇️ Backward
+        </button>
+        <button
+          id="btnSendToBack"
+          title="Paling Belakang"
+          class="p-1.5 hover:bg-slate-100 rounded text-slate-700 transition border"
+        >
+          🔝 Back
+        </button>
+        <label class="text-sm font-medium text-slate-600">Warna Aktif:</label>
+        <input
+          type="color"
+          id="colorPicker"
+          value="#3b82f6"
+          class="w-8 h-8 rounded border cursor-pointer"
+        />
+        <button
+          id="btnDelete"
+          class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm font-medium transition"
+        >
+          Hapus Objek
+        </button>
+        <button
+          id="btnClear"
+          class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded text-sm font-medium transition"
+        >
+          Reset Kanvas
+        </button>
+        <button
+          id="btnExport"
+          class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded text-sm font-medium transition"
+        >
+          Simpan / Download
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Sidebar Kiri: Pilihan Stamp & Objek -->
+      <aside
+        class="w-72 bg-white border-r p-4 overflow-y-auto flex flex-col gap-6 shadow-sm"
+      >
+        <!-- Section 1: Stamp Preset -->
+        <div>
+          <h2
+            class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3"
+          >
+            Pilihan Stamp
+          </h2>
+          <div class="grid grid-cols-2 gap-2" id="stampList">
+            <button
+              class="stamp-btn border border-slate-200 p-2 rounded hover:border-blue-500 flex flex-col items-center gap-1 transition"
+              data-url="http://api.iconify.design/heroicons:check-badge-solid.svg"
+            >
+              <img
+                src="http://api.iconify.design/heroicons:check-badge-solid.svg"
+                class="w-10 h-10"
+              />
+              <span class="text-xs text-slate-600">Verified</span>
+            </button>
+            <button
+              class="stamp-btn border border-slate-200 p-2 rounded hover:border-blue-500 flex flex-col items-center gap-1 transition"
+              data-url="http://api.iconify.design/heroicons:exclamation-triangle-solid.svg"
+            >
+              <img
+                src="http://api.iconify.design/heroicons:exclamation-triangle-solid.svg"
+                class="w-10 h-10"
+              />
+              <span class="text-xs text-slate-600">Warning</span>
+            </button>
+            <button
+              class="stamp-btn border border-slate-200 p-2 rounded hover:border-blue-500 flex flex-col items-center gap-1 transition"
+              data-url="http://api.iconify.design/heroicons:star-solid.svg"
+            >
+              <img
+                src="http://api.iconify.design/heroicons:star-solid.svg"
+                class="w-10 h-10"
+              />
+              <span class="text-xs text-slate-600">Star</span>
+            </button>
+            <button
+              class="stamp-btn border border-slate-200 p-2 rounded hover:border-blue-500 flex flex-col items-center gap-1 transition"
+              data-url="http://api.iconify.design/heroicons:heart-solid.svg"
+            >
+              <img
+                src="http://api.iconify.design/heroicons:heart-solid.svg"
+                class="w-10 h-10"
+              />
+              <span class="text-xs text-slate-600">Approved</span>
+            </button>
+            <!-- start 8th row -->
+            <button
+              class="stamp-btn- border border-slate-200 p-2 rounded hover:border-blue-500 flex flex-col items-center gap-1 transition"
+              data-url="images/openmoji--axe.svg"
+              id="stampAxe"
+            >
+              <img src="images/openmoji--axe.svg" class="w-10 h-10" />
+              <span class="text-xs text-slate-600">Kapak</span>
+            </button>
+            <button
+              class="stamp-btn- border border-slate-200 p-2 rounded hover:border-blue-500 flex flex-col items-center gap-1 transition"
+              id="stampBaloon1"
+            >
+              <div id="ikonBaloon1"></div>
+              <span class="text-xs text-slate-600">Baloon 1</span>
+            </button>
+            <button
+              class="stamp-btn border border-slate-200 p-2 rounded hover:border-blue-500 flex flex-col items-center gap-1 transition"
+              id="stampBaloon2"
+            >
+              <div id="ikonBaloon2"></div>
+              <span class="text-xs text-slate-600">Baloon 2</span>
+            </button>
+            <button
+              class="stamp-btn border border-slate-200 p-2 rounded hover:border-blue-500 flex flex-col items-center gap-1 transition"
+              id="stampTelevision1"
+            >
+              <div id="ikonTelevision1"></div>
+              <span class="text-xs text-slate-600">TV</span>
+            </button>
+
+            <!-- end 8th row -->
+          </div>
+        </div>
+
+        <!-- Section 2: Shape & Tool -->
+        <div>
+          <h2
+            class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3"
+          >
+            Tambah Objek
+          </h2>
+          <div class="flex flex-col gap-2">
+            <button
+              id="addRect"
+              class="w-full text-left px-3 py-2 border rounded hover:bg-slate-50 text-sm font-medium text-slate-700"
+            >
+              + Persegi
+            </button>
+            <button
+              id="addCircle"
+              class="w-full text-left px-3 py-2 border rounded hover:bg-slate-50 text-sm font-medium text-slate-700"
+            >
+              + Lingkaran
+            </button>
+            <button
+              id="addLine"
+              class="w-full text-left px-3 py-2 border rounded hover:bg-slate-50 text-sm font-medium text-slate-700"
+            >
+              + Garis
+            </button>
+            <button
+              id="addText"
+              class="w-full text-left px-3 py-2 border rounded hover:bg-slate-50 text-sm font-medium text-slate-700"
+            >
+              + Teks
+            </button>
+            <!-- start custom object -->
+            <!-- Tambahkan di Sidebar Kiri (Section "Tambah Objek") -->
+            <div>
+              <h2
+                class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3"
+              >
+                Tambah Objek Custom
+              </h2>
+              <div class="flex flex-col gap-2">
+                <!-- FITUR BARU: Tombol Upload Gambar -->
+                <label
+                  for="imageUploader"
+                  class="text-left px-3 py-1.5 border border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-100/50 rounded text-sm text-blue-600 font-medium cursor-pointer flex items-center justify-between transition"
+                >
+                  <span>🖼️ Upload Gambar...</span>
+                  <input
+                    type="file"
+                    id="imageUploader"
+                    accept="image/*"
+                    class="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <!-- end custom object -->
+            <!-- start background remover -->
+            <!-- Tambahkan Tombol Hapus Background di Toolbar (Aktif saat objek gambar dipilih) -->
+            <button
+              id="btnRemoveBgModal"
+              class="bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded text-xs font-semibold transition hidden flex items-center gap-1"
+            >
+              <span>🪄</span> Hapus Background
+            </button>
+
+            <!-- Modal Dialog Penghapus Background -->
+            <div
+              id="bgRemoverModal"
+              class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden"
+            >
+              <div
+                class="bg-white rounded-xl shadow-2xl p-6 w-[480px] flex flex-col gap-4 border"
+              >
+                <div class="flex justify-between items-center border-b pb-3">
+                  <h3 class="font-bold text-slate-800 text-sm">
+                    Penghapus Background Gambar
+                  </h3>
+                  <button
+                    id="btnCloseBgModal"
+                    class="text-slate-400 hover:text-slate-600 font-bold text-lg"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                  <p class="text-xs text-slate-500">
+                    Klik warna background pada pratinjau gambar yang ingin
+                    dihapus/dibuat transparan:
+                  </p>
+
+                  <!-- Canvas Preview Gambar -->
+                  <div
+                    class="border rounded-lg bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] flex items-center justify-center p-2 min-h-[220px] max-h-[300px] overflow-hidden"
+                  >
+                    <canvas
+                      id="previewRemoveBgCanvas"
+                      class="cursor-crosshair max-w-full max-h-[260px] object-contain"
+                    ></canvas>
+                  </div>
+
+                  <!-- Kontrol Sensitivitas / Tolerance -->
+                  <div class="flex flex-col gap-1">
+                    <div
+                      class="flex justify-between text-xs font-medium text-slate-600"
+                    >
+                      <label for="bgTolerance"
+                        >Toleransi Warna (Sensitivitas):</label
+                      >
+                      <span id="toleranceVal">30</span>
+                    </div>
+                    <input
+                      type="range"
+                      id="bgTolerance"
+                      min="1"
+                      max="150"
+                      value="30"
+                      class="w-full accent-indigo-600 cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t">
+                  <button
+                    id="btnCancelBg"
+                    class="px-4 py-1.5 border rounded text-xs font-medium text-slate-600 hover:bg-slate-50"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    id="btnApplyRemoveBg"
+                    class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-medium transition"
+                  >
+                    Terapkan Hasil
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- end background remover -->
+            <!-- start border only -->
+            <!-- Tambahan Toolbar Properti Shape (Border & Stroke) -->
+            <div
+              id="shapeControls"
+              class="flex items-center gap-2 border-l border-r px-3 py-1 border-slate-200 hidden"
+            >
+              <label class="text-xs font-semibold text-slate-500"
+                >Bentuk:</label
+              >
+
+              <!-- Checkbox Isian Transparan (Only Border) -->
+              <label
+                class="flex items-center gap-1 cursor-pointer text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
+              >
+                <input
+                  type="checkbox"
+                  id="transparentFill"
+                  class="rounded accent-blue-600"
+                />
+                <span>Tanpa Isi (Transparan)</span>
+              </label>
+
+              <!-- Color Picker Warna Border -->
+              <div class="flex items-center gap-1">
+                <label
+                  for="strokeColorPicker"
+                  class="text-[11px] text-slate-500"
+                  >Garis:</label
+                >
+                <input
+                  type="color"
+                  id="strokeColorPicker"
+                  value="#000000"
+                  class="w-7 h-7 rounded border cursor-pointer"
+                  title="Warna Border"
+                />
+              </div>
+
+              <!-- Input Ketebalan Border -->
+              <div class="flex items-center gap-1">
+                <label for="strokeWidthInput" class="text-[11px] text-slate-500"
+                  >Tebal:</label
+                >
+                <input
+                  type="number"
+                  id="strokeWidthInput"
+                  value="2"
+                  min="0"
+                  max="50"
+                  class="w-14 text-xs border rounded px-1.5 py-1 text-center text-slate-700 focus:outline-none focus:border-blue-500"
+                  title="Ketebalan Border (px)"
+                />
+              </div>
+            </div>
+            <!-- end border only -->
+          </div>
+
+          <!-- start add line property -->
+          <!-- Tambahan Toolbar Properti Garis (Style & Arrow) -->
+          <div
+            id="lineControls"
+            class="flex items-center gap-2 border-l border-r px-3 py-1 border-slate-200 hidden"
+          >
+            <label class="text-xs font-semibold text-slate-500">Garis:</label>
+
+            <!-- Dropdown Style Garis -->
+            <select
+              id="lineDashStyle"
+              class="text-xs border rounded px-2 py-1.5 bg-white text-slate-700 focus:outline-none focus:border-blue-500"
+            >
+              <option value="solid">━━━━ Utuh (Solid)</option>
+              <option value="dashed">╌╌╌╌ Putus-putus (Dashed)</option>
+              <option value="dotted">•••• Titik-titik (Dotted)</option>
+            </select>
+
+            <!-- Dropdown Ujung Panah -->
+            <select
+              id="lineArrowStyle"
+              class="text-xs border rounded px-2 py-1.5 bg-white text-slate-700 focus:outline-none focus:border-blue-500"
+            >
+              <option value="none">Tanpa Panah</option>
+              <option value="end">Panah Ujung (➔)</option>
+              <option value="start">Panah Pangkal (⬅)</option>
+              <option value="both">Panah Dua Sisi (↔)</option>
+            </select>
+          </div>
+          <!-- end add line property -->
+          <!-- start border and grid -->
+          <!-- 1. Tambah Tombol Grid & Snap pada Toolbar Utama -->
+          <div
+            class="flex items-center gap-2 border-l px-3 py-1 border-slate-200"
+          >
+            <button
+              id="btnToggleGrid"
+              class="px-2.5 py-1 rounded text-xs font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5"
+              title="Tampilkan/Sembunyikan Grid"
+            >
+              <span>🌐</span> Grid:
+              <span id="statusGrid" class="font-bold text-red-500">OFF</span>
+            </button>
+            <button
+              id="btnToggleSnap"
+              class="px-2.5 py-1 rounded text-xs font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5"
+              title="Tempel Otomatis ke Grid"
+            >
+              <span>🧲</span> Snap:
+              <span id="statusSnap" class="font-bold text-red-500">OFF</span>
+            </button>
+          </div>
+
+          <!-- 2. Wrapper Kanvas dengan Penggaris (Ruler) Atas & Kiri -->
+          <div
+            class="relative flex-1 bg-slate-100 overflow-auto flex items-center justify-center p-8"
+          >
+            <div class="relative bg-white shadow-xl border border-slate-300">
+              <!-- Ruler Atas (Top Ruler) -->
+              <div
+                id="rulerTop"
+                class="absolute -top-6 left-0 right-0 h-6 bg-slate-200 border-b border-slate-300 flex text-[9px] text-slate-500 select-none overflow-hidden"
+              ></div>
+
+              <!-- Ruler Kiri (Left Ruler) -->
+              <div
+                id="rulerLeft"
+                class="absolute top-0 -left-6 bottom-0 w-6 bg-slate-200 border-r border-slate-300 flex flex-col text-[9px] text-slate-500 select-none overflow-hidden"
+              ></div>
+
+              <!-- Kanvas Utama Fabric.js -->
+              <canvas id="mainCanvas" width="800" height="600"></canvas>
+            </div>
+          </div>
+          <!-- end border and grid -->
+        </div>
+      </aside>
+
+      <!-- Area Tengah: Canvas Area -->
+      <main
+        class="flex-1 flex items-center justify-center p-6 bg-slate-200 overflow-auto"
+      >
+        <div class="bg-white shadow-xl rounded-lg overflow-hidden border">
+          <canvas id="editorCanvas" width="800" height="600"></canvas>
+        </div>
+      </main>
+      <aside class="w-72 bg-white border-l p-4 flex flex-col shadow-sm">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            Daftar Layer
+          </h2>
+          <span
+            id="layerCount"
+            class="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full"
+            >0</span
+          >
+        </div>
+
+        <!-- Container List Layer -->
+        <div
+          id="layerList"
+          class="flex-1 overflow-y-auto flex flex-col gap-2 pr-1"
+        >
+          <div class="text-xs text-slate-400 text-center py-8">
+            Belum ada objek di kanvas
+          </div>
+        </div>
+        <!-- start flipper -->
+        <!-- Tombol Flip Gambar di Toolbar (Tampil saat objek gambar terpilih) -->
+        <div
+          id="imageFlipControls"
+          class="flex items-center gap-1 border-l pl-2 border-slate-200 hidden"
+        >
+          <button
+            id="btnFlipX"
+            class="px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded text-xs font-medium transition flex items-center gap-1"
+            title="Flip Horizontal (Kiri/Kanan)"
+          >
+            <span>↔️</span> Flip X
+          </button>
+          <button
+            id="btnFlipY"
+            class="px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded text-xs font-medium transition flex items-center gap-1"
+            title="Flip Vertical (Atas/Bawah)"
+          >
+            <span>↕️</span> Flip Y
+          </button>
+        </div>
+        <!-- end flipper -->
+        <!-- start templater -->
+        <!-- Tombol Management Template pada Toolbar -->
+        <div
+          class="flex items-center gap-2 border-l px-3 py-1 border-slate-200"
+        >
+          <!-- Simpan Objek Terpilih / Semua Objek sebagai Template -->
+          <button
+            id="btnSaveTemplate"
+            class="px-2.5 py-1 rounded text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5"
+            title="Simpan sebagai Template"
+          >
+            <span>💾</span> Simpan Template
+          </button>
+
+          <!-- Modal / Dropdown Panggil Template -->
+          <select
+            id="selectTemplateList"
+            class="text-xs border rounded px-2 py-1.5 bg-white text-slate-700 focus:outline-none focus:border-blue-500"
+          >
+            <option value="">-- Muat Template --</option>
+          </select>
+        </div>
+        <!-- end templater -->
+        <!-- start artistik text -->
+        <!-- Toolbar Efek Teks Artistik -->
+        <div
+          id="artisticTextControls"
+          class="flex items-center gap-2 border-l px-3 py-1 border-slate-200 hidden"
+        >
+          <!-- Preset Efek Cepat -->
+          <select
+            id="textPresetSelect"
+            class="text-xs border rounded px-2 py-1.5 bg-white text-slate-700 focus:outline-none focus:border-indigo-500"
+          >
+            <option value="">-- Gaya Artistik --</option>
+            <option value="neon">💡 Neon Glow</option>
+            <option value="3d">🧊 Efek 3D / Pop</option>
+            <option value="gradient">🌈 Gradient Sunset</option>
+            <option value="outline">✏️ Outline Bold</option>
+          </select>
+
+          <!-- Toggle Shadow -->
+          <button
+            id="btnToggleShadow"
+            class="px-2 py-1 border rounded text-xs text-slate-700 hover:bg-slate-50"
+            title="Bayangan Teks"
+          >
+            👤 Shadow
+          </button>
+
+          <!-- Warna & Tebal Stroke Teks -->
+          <div class="flex items-center gap-1">
+            <label for="textStrokeColor" class="text-[11px] text-slate-500"
+              >Outline:</label
+            >
+            <input
+              type="color"
+              id="textStrokeColor"
+              value="#000000"
+              class="w-6 h-6 rounded border cursor-pointer"
+            />
+            <input
+              type="number"
+              id="textStrokeWidth"
+              value="0"
+              min="0"
+              max="10"
+              class="w-10 text-xs border rounded p-1 text-center"
+            />
+          </div>
+        </div>
+        <!-- end artistik text -->
+        <!-- start template saver -->
+        <div
+          class="flex items-center gap-2 border-l px-3 py-1 border-slate-200"
+        >
+          <!-- Download File Template -->
+          <button
+            id="btnExportJson"
+            class="px-2.5 py-1 rounded text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1 border"
+          >
+            <span>📥</span> Unduh File Template (.json)
+          </button>
+
+          <!-- Upload File Template -->
+          <label
+            class="cursor-pointer px-2.5 py-1 rounded text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1 border"
+          >
+            <span>📤</span> Buka File Template
+            <input
+              type="file"
+              id="importJsonInput"
+              accept=".json"
+              class="hidden"
+            />
+          </label>
+        </div>
+        <!-- end template saver -->
+      </aside>
+    </div>
+    <!-- Script Utama Canvas -->
+    <script src="js/canvas-editor.js"></script>
+  </body>
+</html>
