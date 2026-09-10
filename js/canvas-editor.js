@@ -1675,4 +1675,67 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("ikonBaloon1").innerHTML = stampBaloon1;
   document.getElementById("ikonBaloon2").innerHTML = stampBaloon2;
   document.getElementById("ikonTelevision1").innerHTML = stampTelevision1;
+
+  // ==========================================
+  // KONTROL LAYOUT RESPONSIF MOBILE
+  // ==========================================
+
+  const btnToggleMobileSidebar = document.getElementById(
+    "btnToggleMobileSidebar",
+  );
+  const btnToggleMobileLayers = document.getElementById(
+    "btnToggleMobileLayers",
+  );
+  const btnCloseLeftSidebar = document.getElementById("btnCloseLeftSidebar");
+  const btnCloseRightSidebar = document.getElementById("btnCloseRightSidebar");
+  const mobileBackdrop = document.getElementById("mobileBackdrop");
+
+  const leftSidebar = document.getElementById("leftSidebar");
+  const rightSidebar = document.getElementById("rightSidebar");
+
+  // Buka Sidebar Kiri
+  btnToggleMobileSidebar?.addEventListener("click", () => {
+    leftSidebar.classList.remove("-translate-x-full");
+    mobileBackdrop.classList.remove("hidden");
+  });
+
+  // Buka Sidebar Kanan (Layer)
+  btnToggleMobileLayers?.addEventListener("click", () => {
+    rightSidebar.classList.remove("translate-x-full");
+    mobileBackdrop.classList.remove("hidden");
+  });
+
+  // Tutup Semua Sidebar Mobile
+  function closeMobileDrawers() {
+    leftSidebar.classList.add("-translate-x-full");
+    rightSidebar.classList.add("translate-x-full");
+    mobileBackdrop.classList.add("hidden");
+  }
+
+  btnCloseLeftSidebar?.addEventListener("click", closeMobileDrawers);
+  btnCloseRightSidebar?.addEventListener("click", closeMobileDrawers);
+  mobileBackdrop?.addEventListener("click", closeMobileDrawers);
+
+  // ==========================================
+  // AUTO-FIT CANVAS DI LAYAR HP
+  // ==========================================
+
+  // Jalankan responsivitas kanvas saat dimuat & di-resize window
+  console.log("OBJS Got", objs);
+  objs
+    .map((obj) => {
+      return [obj.name, obj.category, obj.val];
+    })
+    .forEach((img) => {
+      console.log("Img", img);
+      const newElem = document.createElement("button");
+      newElem.innerHTML = `${img[2]} `;
+      newElem.title = `${img[0]}`;
+      newElem.style.width = "30px";
+      newElem.style.height = "30px";
+      newElem.addEventListener("click", function () {
+        loadImage(img[2]);
+      });
+      document.getElementById("thisobjects").appendChild(newElem);
+    });
 });
