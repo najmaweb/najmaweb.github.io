@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kumil Canvas Editor & Stamp App</title>
     <!-- Tailwind CSS untuk Layout -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="http://cdn.tailwindcss.com"></script>
     <!-- Fabric.js Library -->
     <script src="js/fabric.min.js"></script>
     <script src="js/objects.js"></script>
@@ -15,7 +15,7 @@
     <header
       class="bg-white border-b px-6 py-3 flex justify-between items-center shadow-sm"
     >
-      <h1 class="text-lg font-bold text-slate-800">Najma Canvas</h1>
+      <h1 class="text-lg font-bold text-slate-800">Canvas Stamp Editor</h1>
       <div class="flex items-center gap-4">
         <!-- Tambahkan di Header Toolbar (di dalam div flex items-center gap-3) -->
         <div
@@ -207,6 +207,7 @@
           >
             Pilihan Stamp
           </h2>
+          <div id="thisobjects"></div>
           <div class="grid grid-cols-2 gap-2" id="stampList">
             <button
               class="stamp-btn border border-slate-200 p-2 rounded hover:border-blue-500 flex flex-col items-center gap-1 transition"
